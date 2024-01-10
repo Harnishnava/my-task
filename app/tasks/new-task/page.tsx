@@ -12,6 +12,7 @@ import error from "next/error";
 import Error from "next/error";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTaskSchema } from "@/app/ValidationSchema";
+import Errormessage from "@/app/components/Errormessage";
 import { z } from "zod";
 
 type TaskForm = z.infer<typeof createTaskSchema>;
@@ -52,11 +53,7 @@ const newTaskpage = () => {
           </TextField.Slot>
           <TextField.Input placeholder="Title" {...register("title")} />
         </TextField.Root>
-        {errors.title && (
-          <Text color="red" as="p">
-            {errors.title.message}
-          </Text>
-        )}
+        <Errormessage>{errors.title?.message}</Errormessage>
         <Controller
           name="description"
           control={control}
@@ -64,11 +61,8 @@ const newTaskpage = () => {
             <SimpleMDE placeholder="Description" {...field} />
           )}
         />
-        {errors.description && (
-          <Text color="red" as="p">
-            {errors.description.message}
-          </Text>
-        )}
+
+        <Errormessage>{errors.description?.message}</Errormessage>
 
         <Button>Add Task</Button>
       </form>
