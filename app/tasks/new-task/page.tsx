@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { TextField, Button, Callout } from "@radix-ui/themes";
+import { TextField, Button, Callout, Text } from "@radix-ui/themes";
 import { useForm, Controller } from "react-hook-form";
 import SimpleMDE from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
@@ -10,15 +10,22 @@ import { data } from "autoprefixer";
 import { useRouter } from "next/navigation";
 import error from "next/error";
 import Error from "next/error";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createTaskSchema } from "@/app/ValidationSchema";
+import { z } from "zod";
 
-interface TaskForm {
-  title: string;
-  description: string;
-}
+type TaskForm = z.infer<typeof createTaskSchema>;
 
 const newTaskpage = () => {
   const router = useRouter();
-  const { register, control, handleSubmit } = useForm<TaskForm>();
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<TaskForm>({
+    resolver: zodResolver(createTaskSchema),
+  });
   const [error, setError] = useState("");
 
   return (
@@ -45,6 +52,11 @@ const newTaskpage = () => {
           </TextField.Slot>
           <TextField.Input placeholder="Title" {...register("title")} />
         </TextField.Root>
+        {errors.title && (
+          <Text color="red" as="p">
+            {errors.title.message}
+          </Text>
+        )}
         <Controller
           name="description"
           control={control}
@@ -52,6 +64,11 @@ const newTaskpage = () => {
             <SimpleMDE placeholder="Description" {...field} />
           )}
         />
+        {errors.description && (
+          <Text color="red" as="p">
+            {errors.description.message}
+          </Text>
+        )}
 
         <Button>Add Task</Button>
       </form>
