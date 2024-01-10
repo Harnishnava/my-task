@@ -8,8 +8,7 @@ import { CiSearch } from "react-icons/ci";
 import axios from "axios";
 import { data } from "autoprefixer";
 import { useRouter } from "next/navigation";
-import error from "next/error";
-import Error from "next/error";
+import Spinner from "@/app/components/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createTaskSchema } from "@/app/ValidationSchema";
 import Errormessage from "@/app/components/Errormessage";
@@ -28,6 +27,7 @@ const newTaskpage = () => {
     resolver: zodResolver(createTaskSchema),
   });
   const [error, setError] = useState("");
+  const [isSubmmiting, setSubmmiting] = useState(false);
 
   return (
     <div className="max-w-xl">
@@ -40,9 +40,11 @@ const newTaskpage = () => {
         className="space-y-3"
         onSubmit={handleSubmit(async (data) => {
           try {
+            setSubmmiting(true);
             await axios.post("/api/tasks", data);
             router.push("/tasks");
           } catch (error) {
+            setSubmmiting(false);
             setError("An unexpected error accured.");
           }
         })}
@@ -64,7 +66,9 @@ const newTaskpage = () => {
 
         <Errormessage>{errors.description?.message}</Errormessage>
 
-        <Button>Add Task</Button>
+        <Button disabled={isSubmmiting}>
+          Add Task {isSubmmiting && <Spinner />}
+        </Button>
       </form>
     </div>
   );
